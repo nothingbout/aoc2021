@@ -1,6 +1,10 @@
-with open('example_input.txt', 'r') as f:
-    lines = [line.rstrip('\r\n') for line in f.readlines()]
+input_file = 'example_input.txt'
 
-for line in lines:
-    print(line)
+def parse_input():
+    with open(input_file, 'r') as f:
+        lines = [line.rstrip('\r\n') for line in f.readlines()]
 
+    for line in lines:
+        print(line)
+
+    return lines
