@@ -94,9 +94,6 @@ def parse_input():
     scanners.append(Scanner(current_scanner_beacons))
     return scanners
 
-def is_overlap(a_beacons, b_beacons):
-    return len(set(a_beacons).intersection(b_beacons)) >= 12
-
 def rotate_beacons(beacons, rotation):
     return [p.rotated(rotation) for p in beacons]
 
@@ -106,23 +103,31 @@ def offset_beacons(beacons, offset):
 def transform_beacons(beacons, transform):
     return offset_beacons(rotate_beacons(beacons, transform.rotation), transform.offset)
 
+def find_overlap_from_offsets(all_offsets):
+    offset_counts = {}
+    for offset in all_offsets:
+        count = offset_counts.get(offset, 0)
+        count += 1
+        if count >= 12:
+            return offset
+        offset_counts[offset] = count
+
 def find_overlap(scanner_a, scanner_b, a_transform):
     a_beacons = transform_beacons(scanner_a.beacons, a_transform)
 
     for rotation in range(24):
         b_beacons = rotate_beacons(scanner_b.beacons, rotation)
 
-        for p1 in a_beacons:
-            for p2 in b_beacons:
-                offset = p1.sub(p2)
-                if is_overlap(a_beacons, offset_beacons(b_beacons, offset)):
-                    # print(f'overlap: {rotation} {offset}')
-                    return Transform(rotation, offset)
+        all_offsets = [p1.sub(p2) for p2 in b_beacons for p1 in a_beacons]
 
+        offset = find_overlap_from_offsets(all_offsets)
+        if offset:
+            return Transform(rotation, offset)
 
 scanners = parse_input()
 scanner_transforms = [None] * len(scanners)
 scanner_transforms[0] = Transform(0, Point(0, 0, 0))
+already_checked_pairs = set()
 
 while None in scanner_transforms:
     for a_index in range(len(scanners)):
@@ -131,6 +136,10 @@ while None in scanner_transforms:
 
         for b_index in range(len(scanners)):
             if scanner_transforms[b_index] is not None: continue
+
+            pair = (a_index, b_index)
+            if pair in already_checked_pairs: continue
+            already_checked_pairs.add(pair)
 
             transform = find_overlap(scanners[a_index], scanners[b_index], a_transform)
             if transform:
