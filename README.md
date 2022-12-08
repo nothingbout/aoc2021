@@ -3,7 +3,7 @@
 Time from opening the challenge for the first time to submitting the correct solutions.
 
 |  | One star | Both stars |
-| - | - | - | - |
+| - | - | - |
 | Day 1 | ~2m | ~3m |
 | Day 2 | ~3m | ~4m |
 | Day 3 | ~5m | ~22m |
